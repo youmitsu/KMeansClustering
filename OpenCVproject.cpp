@@ -56,11 +56,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	Mat src = imread("img_thermal_3.jpg", IMREAD_GRAYSCALE);
 	Mat image1(Size(600,600),CV_8UC3);
 	resize(src, image1,image1.size(),0,0,INTER_LINEAR);
-/*	Mat resizeThermal(image1.rows*0.5,image1.cols*0.5,image1.type());
-	resize(dishes, resizeDishes,Size(),0.5,0.5);
-	namedWindow("dishes");
-	imshow("dishes",resizeDishes);
-	*/
+
 	namedWindow("元画像");
 	imshow("元画像", image1);
 	//----------二値画像（大津）-------------------------------
@@ -184,26 +180,6 @@ int _tmain(int argc, _TCHAR* argv[])
 			bestCenterY[i] = kCenterY[i];
 	    }  
 	}
-/*	
-	Mat newImg = Mat(Size(width,height),CV_8UC3);
-	cvtColor(image2,newImg,CV_GRAY2BGR);
-	for(i= 0;i < data.size(); i++){
-		if(clsLabel[i] == 0){
-			rectangle(newImg,Point(data[i].y,data[i].x),
-				Point(data[i].y,data[i].x),Scalar(255,0,0),1,1);
-		}else if(clsLabel[i] == 1){
-			rectangle(newImg,Point(data[i].y,data[i].x),
-				Point(data[i].y,data[i].x),Scalar(0,255,0),1,1);
-		}else{
-			rectangle(newImg,Point(data[i].y,data[i].x),
-				Point(data[i].y,data[i].x),Scalar(0,0,255),1,1);
-		}
-	}
-	for(i = 0; i < k;i++){
-		circle(newImg,Point(kCenterX[i],kCenterY[i]),1,Scalar(0,0,0));
-	}
-	images[h] = newImg;
-*/	
 	}
 
 //********************最終結果表示*********************
@@ -355,6 +331,10 @@ int _tmain(int argc, _TCHAR* argv[])
 			Point(maxY_3,maxX_3),Scalar(0,0,255),1,1);
 	namedWindow("dishes");
 	imshow("dishes",resizeDishes);
+//画像出力
+	imwrite("output1.jpg",roi1);
+	imwrite("output2.jpg",roi2);
+	imwrite("output3.jpg",roi3);
 
 	waitKey(0);
 	destroyAllWindows();
