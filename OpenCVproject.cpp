@@ -39,7 +39,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	int i,j,h,randIndex;
 	double p,minWcv;
-	const int nStart = 1;
+	const int nStart = 5;
 	const int k = 3;    //クラスタ数
     Vector<Point> data;     //データ群
     double kCenterX[k];     //クラスタセンターのX座標
@@ -53,7 +53,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	double totalX[k];         
 	double totalY[k];
 	//----------元画像-----------------------------------------
-	Mat image1 = imread("img_thermal_3.jpg", IMREAD_GRAYSCALE);
+	Mat src = imread("img_thermal_3.jpg", IMREAD_GRAYSCALE);
+	Mat image1(Size(600,600),CV_8UC3);
+	resize(src, image1,image1.size(),0,0,INTER_LINEAR);
+/*	Mat resizeThermal(image1.rows*0.5,image1.cols*0.5,image1.type());
+	resize(dishes, resizeDishes,Size(),0.5,0.5);
+	namedWindow("dishes");
+	imshow("dishes",resizeDishes);
+	*/
 	namedWindow("元画像");
 	imshow("元画像", image1);
 	//----------二値画像（大津）-------------------------------
@@ -73,8 +80,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			else{
 				Point p(j,i);
 				data.push_back(p);
-	//			printf("%d %d",j,i);
-
+		//		printf("x:%d, y:%d",j,i);
 			}	
 		}
 	}
@@ -89,7 +95,7 @@ int _tmain(int argc, _TCHAR* argv[])
 //---------初期のクラスタセンタ―を設定------------
 	for(i = 0; i < k;i++){
 		randIndex = (int)rand()%(nData+1);
-
+	//	printf("[%d]%d",h,randIndex);
 		kCenterX[i] = (int)data[randIndex].x;
 		kCenterY[i] = (int)data[randIndex].y;
 	}
@@ -144,8 +150,8 @@ int _tmain(int argc, _TCHAR* argv[])
 			kCenterX[i] = meanX[i];
 			kCenterY[i] = meanY[i];
 			if(h == 1){
-			printf("X2:%lf,",kCenterX[i]);
-		    printf("Y2:%lf,",kCenterY[i]);
+//			printf("X2:%lf,",kCenterX[i]);
+//		    printf("Y2:%lf,",kCenterY[i]);
 			}
 		}
   //-------------新しいクラスタセンタが同じ点であるかどうかの判定-------------
@@ -169,7 +175,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		var += sqrt((p.x-q.x)*(p.x-q.x)+(p.y-q.y)*(p.y-q.y));
 	}
 	double wcv = var / data.size();
-	printf("wcv:%lf",wcv);
+//	printf("wcv:%lf",wcv);
 	if(wcv < minWcv){
 		minWcv = wcv;
 		bestIterCount = iterCount;
@@ -178,7 +184,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			bestCenterY[i] = kCenterY[i];
 	    }  
 	}
-	
+/*	
 	Mat newImg = Mat(Size(width,height),CV_8UC3);
 	cvtColor(image2,newImg,CV_GRAY2BGR);
 	for(i= 0;i < data.size(); i++){
@@ -193,8 +199,11 @@ int _tmain(int argc, _TCHAR* argv[])
 				Point(data[i].y,data[i].x),Scalar(0,0,255),1,1);
 		}
 	}
+	for(i = 0; i < k;i++){
+		circle(newImg,Point(kCenterX[i],kCenterY[i]),1,Scalar(0,0,0));
+	}
 	images[h] = newImg;
-	
+*/	
 	}
 
 //********************最終結果表示*********************
@@ -264,38 +273,55 @@ int _tmain(int argc, _TCHAR* argv[])
 	}while(changed);
 
 //-----------------結果の描画------------------------------------
-/*	
-	namedWindow("0");
-	imshow("0",images[0]);
-	namedWindow("0");
-	imshow("1",images[1]);
-	namedWindow("0");
-	imshow("2",images[2]);
-	namedWindow("0");
-	imshow("3",images[3]);
-	namedWindow("0");
-	imshow("4",images[4]);
-	namedWindow("0");
-	imshow("5",images[5]);
-	namedWindow("0");
-	imshow("6",images[6]);
-	namedWindow("0");
-	imshow("7",images[7]);
-	namedWindow("0");
-	imshow("8",images[8]);
-	namedWindow("0");
-	imshow("9",images[9]);
-	*/
-	Mat newImg = Mat(Size(width,height),CV_8UC3);
+	Mat newImg = Mat(Size(600,600),CV_8UC3);
 	cvtColor(image2,newImg,CV_GRAY2BGR);
+	int minX_1 = 10000000000;
+	int minY_1 = 10000000000;
+	int maxX_1 = 0;
+	int maxY_1 = 0;
+	int minX_2 = 10000000000;
+	int minY_2 = 10000000000;
+	int maxX_2 = 0;
+	int maxY_2 = 0;
+	int minX_3 = 10000000000;
+	int minY_3 = 10000000000;
+	int maxX_3 = 0;
+	int maxY_3 = 0;
 	for(i= 0;i < data.size(); i++){
 		if(clsLabel[i] == 0){
+			if(minX_1 > data[i].x){
+				minX_1 = data[i].x;
+			}if(minY_1 > data[i].y){
+				minY_1 = data[i].y;
+			}if(maxX_1 < data[i].x){
+				maxX_1 = data[i].x;
+			}if(maxY_1 < data[i].y){
+				maxY_1 = data[i].y;
+			}
 			rectangle(newImg,Point(data[i].y,data[i].x),
 				Point(data[i].y,data[i].x),Scalar(255,0,0),1,1);
 		}else if(clsLabel[i] == 1){
+			if(minX_2 > data[i].x){
+				minX_2 = data[i].x;
+			}if(minY_2 > data[i].y){
+				minY_2 = data[i].y;
+			}if(maxX_2 < data[i].x){
+				maxX_2 = data[i].x;
+			}if(maxY_2 < data[i].y){
+				maxY_2 = data[i].y;
+			}
 			rectangle(newImg,Point(data[i].y,data[i].x),
 				Point(data[i].y,data[i].x),Scalar(0,255,0),1,1);
-		}else{
+		}else if(clsLabel[i] = 2){
+			if(minX_3 > data[i].x){
+				minX_3 = data[i].x;
+			}if(minY_3 > data[i].y){
+				minY_3 = data[i].y;
+			}if(maxX_3 < data[i].x){
+				maxX_3 = data[i].x;
+			}if(maxY_3 < data[i].y){
+				maxY_3 = data[i].y;
+			}
 			rectangle(newImg,Point(data[i].y,data[i].x),
 				Point(data[i].y,data[i].x),Scalar(0,0,255),1,1);
 		}
@@ -306,6 +332,29 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	namedWindow("結果");
 	imshow("結果",newImg);	
+//料理の元画像の読み込みとリサイズ
+	Mat dishes = imread("dishes1.png");
+	Mat resizeDishes(Size(600,600),dishes.type());
+	resize(dishes, resizeDishes,resizeDishes.size(),0,0,INTER_LINEAR);
+//料理ごとに矩形で切り抜きと表示	
+	Mat roi1(resizeDishes,Rect(minY_1,minX_1,maxX_1-minX_1,maxY_1-minY_1));
+    Mat roi2(resizeDishes,Rect(minY_2,minX_2,maxX_2-minX_2,maxY_2-minY_2));
+	Mat roi3(resizeDishes,Rect(minY_3,minX_3,maxX_3-minX_3,maxY_3-minY_3));
+	namedWindow("roi1");
+	imshow("roi1",roi1);
+	namedWindow("roi2");
+	imshow("roi2",roi2);
+	namedWindow("roi3");
+	imshow("roi3",roi3);
+//全体の検出結果
+	rectangle(resizeDishes,Point(minY_1,minX_1),
+			Point(maxY_1,maxX_1),Scalar(255,0,0),1,1);
+	rectangle(resizeDishes,Point(minY_2,minX_2),
+			Point(maxY_2,maxX_2),Scalar(0,255,0),1,1);
+	rectangle(resizeDishes,Point(minY_3,minX_3),
+			Point(maxY_3,maxX_3),Scalar(0,0,255),1,1);
+	namedWindow("dishes");
+	imshow("dishes",resizeDishes);
 
 	waitKey(0);
 	destroyAllWindows();
